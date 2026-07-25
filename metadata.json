@@ -1,0 +1,6 @@
+{
+  "name": "Animal Eco Jump",
+  "description": "Juego de animales saltando para esquivar carros y recolectar botellas y cartón para construir su casita ecológica.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
