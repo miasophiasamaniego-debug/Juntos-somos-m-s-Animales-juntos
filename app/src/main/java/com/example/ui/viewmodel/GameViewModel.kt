@@ -167,6 +167,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         stopGameLoop()
         gameLoopJob = viewModelScope.launch(Dispatchers.Default) {
             val engine = gameEngine ?: return@launch
+            var frameCounter = 0
 
             while (_screenState.value == ScreenState.PLAYING) {
                 val event = engine.updateGameStep()
@@ -213,18 +214,21 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     GameEvent.NONE -> {}
                 }
 
-                // Update HUD state
-                _hudState.value = HudData(
-                    score = engine.score,
-                    bottles = engine.bottlesCollected,
-                    cardboard = engine.cardboardCollected,
-                    lives = engine.lives,
-                    distance = engine.distanceTraveled,
-                    targetDistance = engine.level.targetDistance,
-                    hasShield = engine.leafShieldActive,
-                    superJumpTimer = engine.superJumpFrames,
-                    speedBootsTimer = engine.speedBootsFrames
-                )
+                // Update HUD state every ~4 frames or on event to avoid UI recomposition overload
+                frameCounter++
+                if (frameCounter % 4 == 0 || event != GameEvent.NONE) {
+                    _hudState.value = HudData(
+                        score = engine.score,
+                        bottles = engine.bottlesCollected,
+                        cardboard = engine.cardboardCollected,
+                        lives = engine.lives,
+                        distance = engine.distanceTraveled,
+                        targetDistance = engine.level.targetDistance,
+                        hasShield = engine.leafShieldActive,
+                        superJumpTimer = engine.superJumpFrames,
+                        speedBootsTimer = engine.speedBootsFrames
+                    )
+                }
 
                 delay(16) // Approx 60 FPS tick
             }
